@@ -27,7 +27,10 @@ def loadTogglDay():
 def processLogs(logs):
 	for log in logs:
 		desc = splitLogDescription(log['description'])
-		print(desc)
+		print('Issue Number:      ' + desc['issueNumber'])
+		print('Toggl Description: ' + desc['description'])
+		print('Duration:          ' + str(log['duration']))
+		print('-----------------------------------------------')
 
 def splitLogDescription(description):
 	reMatch = re.match( r'([a-zA-Z]+-[0-9]+)\s*(.*)', description)
