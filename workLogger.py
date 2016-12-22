@@ -29,8 +29,26 @@ def processLogs(logs):
 		desc = splitLogDescription(log['description'])
 		print('Issue Number:      ' + desc['issueNumber'])
 		print('Toggl Description: ' + desc['description'])
-		print('Duration:          ' + str(log['duration']))
+		print('Duration:          ' + formatDuration(log['duration']))
+
 		print('-----------------------------------------------')
+
+def formatDuration(duration):
+	ret = ''
+	# remove ms
+	duration = duration / 1000
+
+	hour = int(duration / 3600)
+	if hour > 0:
+		ret += str(hour) + 'h'
+
+	minutes = int((duration % 3600) / 60)
+	if hour > 0 and minutes > 0:
+		ret += ' '
+	if minutes > 0:
+		 ret += str(minutes) + 'm'
+
+	return ret;
 
 def splitLogDescription(description):
 	reMatch = re.match( r'([a-zA-Z]+-[0-9]+)\s*(.*)', description)
