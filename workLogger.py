@@ -41,6 +41,8 @@ class TogglLog:
 			"description" : description
 		}
 
+
+
 def loadTogglDay():
 	url = "https://toggl.com/reports/api/v2/details"
 	# url = "https://www.toggl.com/api/v8/workspaces"
@@ -65,11 +67,16 @@ def loadTogglDay():
 
 def processLogs(logs):
 	for log in logs:
-		print('Issue Number:      ' + log.issueNumber)
 		print('Toggl Description: ' + log.description)
 		print('Duration:          ' + log.durationStr)
 
-		print('-----------------------------------------------')
+		if log.issueNumber is None:
+			log.issueNumber = input('Issue Number:      ')
+		else:
+			print('Issue Number:      ' + log.issueNumber)
+
+
+		print('-----------------------------------------------------------------')
 
 
 
