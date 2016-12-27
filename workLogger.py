@@ -10,7 +10,6 @@ class TogglLog:
 		self.issueNumber = descriptionSplit['issueNumber']
 
 		self.durationMs = log['dur']
-		self.durationStr = self.formatDuration()
 
 	def formatDuration(self):
 		ret = ''
@@ -43,6 +42,8 @@ class TogglLog:
 
 
 
+
+
 def loadTogglDay():
 	url = "https://toggl.com/reports/api/v2/details"
 	# url = "https://www.toggl.com/api/v8/workspaces"
@@ -68,7 +69,7 @@ def loadTogglDay():
 def processLogs(logs):
 	for log in logs:
 		print('Toggl Description: ' + log.description)
-		print('Duration:          ' + log.durationStr)
+		print('Duration:          ' + log.formatDuration())
 
 		if log.issueNumber is None:
 			log.issueNumber = input('Issue Number:      ')
@@ -78,11 +79,26 @@ def processLogs(logs):
 
 		print('-----------------------------------------------------------------')
 
+def groupLogs(logs):
+	from collections import defaultdict
+	groupBy = defaultdict(list)
+	for log in logs:
+		groupBy[log.issueNumber].append(log)
 
+	newList = []
 
+	for issueNumber, group in groupBy.items():
+		log = group[0]
+		sum = 0
+		for log in group:
+			sum += log.durationMs
+		log.durationMs = sum
+		newList.append(log)
+	return newList
 
 def main():
 	togglLogs = loadTogglDay()
+	togglLogs = groupLogs(togglLogs)
 	processLogs(togglLogs)
 
 if __name__ == "__main__":
