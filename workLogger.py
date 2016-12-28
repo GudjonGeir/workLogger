@@ -1,6 +1,7 @@
 import requests
 import datetime
 import re
+import sys
 
 class TogglLog:
 	"""docstring for TogglLog."""
@@ -59,10 +60,32 @@ class JiraAPI():
 	def getIssue(self, issueNumber):
 		url = self.baseUrl + self.getIssueRoute.replace('{issueNumber}', issueNumber)
 		payload = {
-			'fields' : 'summary, description'
+			'fields' : 'summary,description,timetracking'
 		}
 		response = requests.get(url, params=payload, auth=self.auth)
-		print(response.text)
+		if response.status_code == 401:
+			sys.exit("Jira login failed")
+		response.raise_for_status()
+
+		return JiraIssue(response.json())
+
+class JiraIssue():
+	"""docstring for JiraIssue."""
+	def __init__(self, json):
+		self.issueNumber = json['key']
+		timetracking = json['fields'].get('timetracking')
+		self.originalEstimate = timetracking.get('originalEstimate') if timetracking is not None else None
+		self.remainingEstimate = timetracking.get('remainingEstimate') if timetracking is not None else None
+		self.timeSpent = timetracking.get('timeSpent') if timetracking is not None else None
+		self.summary = json['fields']['summary']
+		self.description = json['fields']['description']
+
+	def print(self):
+		print('Jira Issue:         ' + self.issueNumber)
+		print('Summary:            ' + self.summary)
+		if self.originalEstimate is not None: print('Original Estimate:  ' + self.originalEstimate)
+		if self.timeSpent is not None: print('Time Spent:         ' + self.timeSpent)
+		if self.remainingEstimate is not None: print('Remaining Estimate: ' + self.remainingEstimate)
 
 
 def loadTogglDay():
@@ -90,6 +113,7 @@ def loadTogglDay():
 def processLogs(logs):
 	jiraApi = JiraAPI()
 	for log in logs:
+		print('-----------------------------------------------------------------')
 		print('Toggl Description: ' + log.description)
 		print('Duration:          ' + log.formatDuration())
 
@@ -98,9 +122,11 @@ def processLogs(logs):
 		else:
 			print('Issue Number:      ' + log.issueNumber)
 
-		jiraApi.getIssue(log.issueNumber)
-
 		print('-----------------------------------------------------------------')
+
+		jiraIssue = jiraApi.getIssue(log.issueNumber)
+		jiraIssue.print()
+		print('-----------------------------------------------------------------\n')
 
 def groupLogs(logs):
 	from collections import defaultdict
