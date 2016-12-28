@@ -41,7 +41,24 @@ class TogglLog:
 		}
 
 
+class JiraAPI():
+	"""docstring for JiraAPI."""
+	def __init__(self):
+		super(JiraAPI, self).__init__()
+		self.baseUrl = 'https://sendiradid.atlassian.net'
+		self.getIssueRoute = '/rest/api/2/issue/{issueNumber}'
+		self.postWorklog = '/rest/tempo-timesheets/3/worklogs/'
+		self.auth = self.authorization()
 
+	def authorization(self):
+		username = input('Jira Username:')
+		password = input('Jira Password:')
+		return requests.auth.HTTPBasicAuth(username, password)
+
+	def getIssue(self, issueNumber):
+		url = self.baseUrl + self.getIssueRoute.replace('{issueNumber}', issueNumber)
+		response = requests.get(url, auth=self.auth)
+		print(response.text)
 
 
 def loadTogglDay():
@@ -67,6 +84,7 @@ def loadTogglDay():
 	return [TogglLog(wl) for wl in worklogs if "Logged" not in wl['tags']]
 
 def processLogs(logs):
+	jiraApi = JiraAPI()
 	for log in logs:
 		print('Toggl Description: ' + log.description)
 		print('Duration:          ' + log.formatDuration())
@@ -76,6 +94,7 @@ def processLogs(logs):
 		else:
 			print('Issue Number:      ' + log.issueNumber)
 
+		jiraApi.getIssue(log.issueNumber)
 
 		print('-----------------------------------------------------------------')
 

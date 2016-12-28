@@ -1,0 +1,199 @@
+{
+    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+    "fields": {
+        "aggregateprogress": {
+            "percent": 0,
+            "progress": 0,
+            "total": 3600
+        },
+        "aggregatetimeestimate": 3600,
+        "aggregatetimeoriginalestimate": 3600,
+        "aggregatetimespent": 0,
+        "assignee": {
+            "active": true,
+            "avatarUrls": {
+                "16x16": "https://avatar-cdn.atlassian.com/56f904f2dd4ae527fef73c626da8dad1?s=16&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dxsmall%26ownerId%3Dgudjon%26avatarId%3D11900%26noRedirect%3Dtrue",
+                "24x24": "https://avatar-cdn.atlassian.com/56f904f2dd4ae527fef73c626da8dad1?s=24&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dsmall%26ownerId%3Dgudjon%26avatarId%3D11900%26noRedirect%3Dtrue",
+                "32x32": "https://avatar-cdn.atlassian.com/56f904f2dd4ae527fef73c626da8dad1?s=32&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dmedium%26ownerId%3Dgudjon%26avatarId%3D11900%26noRedirect%3Dtrue",
+                "48x48": "https://avatar-cdn.atlassian.com/56f904f2dd4ae527fef73c626da8dad1?s=48&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3FownerId%3Dgudjon%26avatarId%3D11900%26noRedirect%3Dtrue"
+            },
+            "displayName": "Guðjón G. Jónsson",
+            "emailAddress": "gudjon@sendiradid.is",
+            "key": "gudjon",
+            "name": "gudjon",
+            "self": "https://sendiradid.atlassian.net/rest/api/2/user?username=gudjon",
+            "timeZone": "Etc/GMT"
+        },
+        "attachment": [
+        ],
+        "comment": {
+            "comments": [
+            ],
+            "maxResults": 0,
+            "startAt": 0,
+            "total": 0
+        },
+        "components": [
+        ],
+        "created": "2016-12-12T13:10:57.829+0000",
+        "creator": {
+            "active": true,
+            "avatarUrls": {
+                "16x16": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=16&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dxsmall%26ownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue",
+                "24x24": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=24&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dsmall%26ownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue",
+                "32x32": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=32&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dmedium%26ownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue",
+                "48x48": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=48&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3FownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue"
+            },
+            "displayName": "Birgir H. Birgisson",
+            "emailAddress": "birgir@sendiradid.is",
+            "key": "birgir",
+            "name": "Birgir",
+            "self": "https://sendiradid.atlassian.net/rest/api/2/user?username=Birgir",
+            "timeZone": "Etc/GMT"
+        },
+        "customfield_10000": null,
+        "customfield_10001": null,
+        "customfield_10002": null,
+        "customfield_10003": null,
+        "customfield_10004": null,
+        "customfield_10007": [
+            "com.atlassian.greenhopper.service.sprint.Sprint@1c0e4ee[id=49,rapidViewId=10,state=ACTIVE,name=Yakkity Yak - Pull Gudjon/Oli,goal=,startDate=2016-12-05T08:21:28.673Z,endDate=2016-12-19T08:21:00.000Z,completeDate=<null>,sequence=49]"
+        ],
+        "customfield_10009": null,
+        "customfield_10012": "0|i00m0t:",
+        "customfield_10013": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10017": null,
+        "customfield_10018": null,
+        "customfield_10019": null,
+        "customfield_10020": null,
+        "customfield_10021": null,
+        "customfield_10022": null,
+        "customfield_10023": "Not started",
+        "customfield_10024": null,
+        "customfield_10100": null,
+        "customfield_10101": [
+        ],
+        "customfield_10102": null,
+        "customfield_10200": null,
+        "customfield_10201": null,
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "customfield_10500": "{}",
+        "customfield_10600": null,
+        "customfield_10700": null,
+        "description": "Test description fyrir dummy issue",
+        "duedate": null,
+        "environment": null,
+        "fixVersions": [
+        ],
+        "issuelinks": [
+        ],
+        "issuetype": {
+            "avatarId": 10318,
+            "description": "A task that needs to be done.",
+            "iconUrl": "https://sendiradid.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype",
+            "id": "3",
+            "name": "Task",
+            "self": "https://sendiradid.atlassian.net/rest/api/2/issuetype/3",
+            "subtask": false
+        },
+        "labels": [
+        ],
+        "lastViewed": "2016-12-28T00:09:31.433+0000",
+        "priority": {
+            "iconUrl": "https://sendiradid.atlassian.net/images/icons/priorities/medium.svg",
+            "id": "3",
+            "name": "Medium",
+            "self": "https://sendiradid.atlassian.net/rest/api/2/priority/3"
+        },
+        "progress": {
+            "percent": 0,
+            "progress": 0,
+            "total": 3600
+        },
+        "project": {
+            "avatarUrls": {
+                "16x16": "https://sendiradid.atlassian.net/secure/projectavatar?size=xsmall&pid=10301&avatarId=10803",
+                "24x24": "https://sendiradid.atlassian.net/secure/projectavatar?size=small&pid=10301&avatarId=10803",
+                "32x32": "https://sendiradid.atlassian.net/secure/projectavatar?size=medium&pid=10301&avatarId=10803",
+                "48x48": "https://sendiradid.atlassian.net/secure/projectavatar?pid=10301&avatarId=10803"
+            },
+            "id": "10301",
+            "key": "SEN",
+            "name": "Sendiráðið",
+            "self": "https://sendiradid.atlassian.net/rest/api/2/project/10301"
+        },
+        "reporter": {
+            "active": true,
+            "avatarUrls": {
+                "16x16": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=16&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dxsmall%26ownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue",
+                "24x24": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=24&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dsmall%26ownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue",
+                "32x32": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=32&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dmedium%26ownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue",
+                "48x48": "https://avatar-cdn.atlassian.com/1cbe72b0b718222a54079ddf68d44f80?s=48&d=https%3A%2F%2Fsendiradid.atlassian.net%2Fsecure%2Fuseravatar%3FownerId%3Dbirgir%26avatarId%3D11400%26noRedirect%3Dtrue"
+            },
+            "displayName": "Birgir H. Birgisson",
+            "emailAddress": "birgir@sendiradid.is",
+            "key": "birgir",
+            "name": "Birgir",
+            "self": "https://sendiradid.atlassian.net/rest/api/2/user?username=Birgir",
+            "timeZone": "Etc/GMT"
+        },
+        "resolution": null,
+        "resolutiondate": null,
+        "status": {
+            "description": "",
+            "iconUrl": "https://sendiradid.atlassian.net/images/icons/statuses/open.png",
+            "id": "10000",
+            "name": "To Do",
+            "self": "https://sendiradid.atlassian.net/rest/api/2/status/10000",
+            "statusCategory": {
+                "colorName": "blue-gray",
+                "id": 2,
+                "key": "new",
+                "name": "To Do",
+                "self": "https://sendiradid.atlassian.net/rest/api/2/statuscategory/2"
+            }
+        },
+        "subtasks": [
+        ],
+        "summary": "Test: Dummy Test - Automate(a) tímaskráningu. ",
+        "timeestimate": 3600,
+        "timeoriginalestimate": 3600,
+        "timespent": 0,
+        "timetracking": {
+            "originalEstimate": "1h",
+            "originalEstimateSeconds": 3600,
+            "remainingEstimate": "1h",
+            "remainingEstimateSeconds": 3600,
+            "timeSpent": "0m",
+            "timeSpentSeconds": 0
+        },
+        "updated": "2016-12-28T00:09:30.932+0000",
+        "versions": [
+        ],
+        "votes": {
+            "hasVoted": false,
+            "self": "https://sendiradid.atlassian.net/rest/api/2/issue/SEN-112/votes",
+            "votes": 0
+        },
+        "watches": {
+            "isWatching": false,
+            "self": "https://sendiradid.atlassian.net/rest/api/2/issue/SEN-112/watchers",
+            "watchCount": 0
+        },
+        "worklog": {
+            "maxResults": 20,
+            "startAt": 0,
+            "total": 0,
+            "worklogs": [
+            ]
+        },
+        "workratio": 0
+    },
+    "id": "24513",
+    "key": "SEN-112",
+    "self": "https://sendiradid.atlassian.net/rest/api/2/issue/24513"
+}
