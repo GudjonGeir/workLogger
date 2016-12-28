@@ -29,7 +29,7 @@ class TogglLog:
 		return ret;
 
 	def splitLogDescription(self, description):
-		reMatch = re.match( r'([a-zA-Z]+-[0-9]+)\s*(.*)', description)
+		reMatch = re.match( r'([a-zA-Z0-9]+-[0-9]+)\s*(.*)', description)
 		issueNumber = None
 		description = description
 		if reMatch:
@@ -51,8 +51,9 @@ class JiraAPI():
 		self.auth = self.authorization()
 
 	def authorization(self):
+		import getpass
 		username = input('Jira Username:')
-		password = input('Jira Password:')
+		password = getpass.getpass('Jira Password:')
 		return requests.auth.HTTPBasicAuth(username, password)
 
 	def getIssue(self, issueNumber):
