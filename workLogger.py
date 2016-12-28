@@ -58,7 +58,10 @@ class JiraAPI():
 
 	def getIssue(self, issueNumber):
 		url = self.baseUrl + self.getIssueRoute.replace('{issueNumber}', issueNumber)
-		response = requests.get(url, auth=self.auth)
+		payload = {
+			'fields' : 'summary, description'
+		}
+		response = requests.get(url, params=payload, auth=self.auth)
 		print(response.text)
 
 
