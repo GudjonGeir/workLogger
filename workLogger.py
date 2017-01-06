@@ -2,6 +2,63 @@ import requests
 import datetime
 import re
 import sys
+import getpass
+
+class TogglApi:
+	"""docstring for TogglApi."""
+	def __init__(self,):
+		self.baseUrl = 'https://www.toggl.com/api/v8'
+		self.getLogsRoute = '/time_entries'
+		self.portTagsRoute = 'TODO'
+		self.auth = self.authorization()
+
+	def authorization(self):
+		username = input('Toggl Username:')
+		password = getpass.getpass('Toggl Password:')
+		return requests.auth.HTTPBasicAuth(username, password)
+
+
+	def getLogs(self, sinceDate=None):
+		url = self.baseUrl + self.getLogsRoute
+
+		sinceDate = sinceDate if sinceDate is not None else datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+		payload = {
+			"start_date" : sinceDate.isoformat() + '+00:00'
+		}
+
+		response = requests.get(url, params=payload, auth=self.auth)
+		if response.status_code == 401:
+			sys.exit("Toggl login failed")
+
+		response.raise_for_status()
+
+		# Parse toggl worklogs json to python object
+		worklogs = response.json()
+		# print(response.text)
+		# Filter out logs that are tagged with 'logged'
+		allLogs = [TogglLog(wl) for wl in worklogs if "Logged" not in wl.get('tags', [])]
+
+		# Group logs by issue number with summed up duration
+		return self.groupLogs(allLogs)
+	# END def getLogs()
+
+	def groupLogs(self, logs):
+		from collections import defaultdict
+		groupBy = defaultdict(list)
+		for log in logs:
+			groupBy[log.issueNumber].append(log)
+
+		newList = []
+
+		for issueNumber, group in groupBy.items():
+			log = group[0]
+			sum = 0
+			for log in group:
+				sum += log.durationSeconds
+			log.durationMs = sum
+			newList.append(log)
+		return newList
+	# END def groupLogs(logs)
 
 class TogglLog:
 	"""docstring for TogglLog."""
@@ -10,12 +67,12 @@ class TogglLog:
 		self.description = descriptionSplit['description']
 		self.issueNumber = descriptionSplit['issueNumber']
 
-		self.durationMs = log['dur']
+		self.durationSeconds = log['duration']
 
 	def formatDuration(self):
 		ret = ''
 		# remove ms
-		duration = self.durationMs / 1000
+		duration = self.durationSeconds
 
 		hour = int(duration / 3600)
 		if hour > 0:
@@ -41,8 +98,17 @@ class TogglLog:
 			"description" : description
 		}
 
+	def print(self):
+		print('Toggl Description: ' + self.description)
+		print('Duration:          ' + self.formatDuration())
 
-class JiraAPI():
+		if self.issueNumber is None:
+			self.issueNumber = input('Issue Number:      ')
+		else:
+			print('Issue Number:      ' + self.issueNumber)
+# END class TogglLog
+
+class JiraAPI:
 	"""docstring for JiraAPI."""
 	def __init__(self):
 		super(JiraAPI, self).__init__()
@@ -52,7 +118,6 @@ class JiraAPI():
 		self.auth = self.authorization()
 
 	def authorization(self):
-		import getpass
 		username = input('Jira Username:')
 		password = getpass.getpass('Jira Password:')
 		return requests.auth.HTTPBasicAuth(username, password)
@@ -68,8 +133,10 @@ class JiraAPI():
 		response.raise_for_status()
 
 		return JiraIssue(response.json())
+# END class JiraAPI
 
-class JiraIssue():
+
+class JiraIssue:
 	"""docstring for JiraIssue."""
 	def __init__(self, json):
 		self.issueNumber = json['key']
@@ -86,41 +153,19 @@ class JiraIssue():
 		if self.originalEstimate is not None: print('Original Estimate:  ' + self.originalEstimate)
 		if self.timeSpent is not None: print('Time Spent:         ' + self.timeSpent)
 		if self.remainingEstimate is not None: print('Remaining Estimate: ' + self.remainingEstimate)
+# END class JiraIssue
 
 
-def loadTogglDay():
-	url = "https://toggl.com/reports/api/v2/details"
-	# url = "https://www.toggl.com/api/v8/workspaces"
 
-	auth = requests.auth.HTTPBasicAuth("12ff1b7c62aaa0a69bbd3f93274538e1", 'api_token')
-
-	payload = {
-		"user_agent" : "gudjongeir@gmail.com",
-		"workspace_id" : "1487773",
-		"since" : datetime.datetime.now().strftime("%Y-%m-%d") # TODO: Optional parameter
-	}
-
-	response = requests.get(url, params=payload, auth=auth)
-
-	response.raise_for_status()
-
-	# Parse toggl worklogs json to python object
-	worklogs = response.json()['data']
-
-	# Filter out logs that are tagged with 'logged'
-	return [TogglLog(wl) for wl in worklogs if "Logged" not in wl['tags']]
-
-def processLogs(logs):
+def main():
+	togglApi = TogglApi()
 	jiraApi = JiraAPI()
-	for log in logs:
-		print('-----------------------------------------------------------------')
-		print('Toggl Description: ' + log.description)
-		print('Duration:          ' + log.formatDuration())
 
-		if log.issueNumber is None:
-			log.issueNumber = input('Issue Number:      ')
-		else:
-			print('Issue Number:      ' + log.issueNumber)
+	togglLogs = togglApi.getLogs()
+
+	for log in togglLogs:
+		print('-----------------------------------------------------------------')
+		log.print()
 
 		print('-----------------------------------------------------------------')
 
@@ -128,27 +173,7 @@ def processLogs(logs):
 		jiraIssue.print()
 		print('-----------------------------------------------------------------\n')
 
-def groupLogs(logs):
-	from collections import defaultdict
-	groupBy = defaultdict(list)
-	for log in logs:
-		groupBy[log.issueNumber].append(log)
-
-	newList = []
-
-	for issueNumber, group in groupBy.items():
-		log = group[0]
-		sum = 0
-		for log in group:
-			sum += log.durationMs
-		log.durationMs = sum
-		newList.append(log)
-	return newList
-
-def main():
-	togglLogs = loadTogglDay()
-	togglLogs = groupLogs(togglLogs)
-	processLogs(togglLogs)
+# END def main()
 
 if __name__ == "__main__":
 	main()
