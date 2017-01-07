@@ -123,13 +123,22 @@ class JiraAPI:
 		super(JiraAPI, self).__init__()
 		self.baseUrl = 'https://sendiradid.atlassian.net'
 		self.getIssueRoute = '/rest/api/2/issue/{issueNumber}'
+		self.getMyselfRoute = '/rest/api/2/myself'
 		self.postWorklogRoute = '/rest/tempo-timesheets/3/worklogs/'
-		self.auth = self.authorization()
 
-	def authorization(self):
-		username = input('Jira Username:')
-		password = getpass.getpass('Jira Password:')
-		return requests.auth.HTTPBasicAuth(username, password)
+	def authenticate(self):
+		while True:
+			username = input('Jira Username:')
+			password = getpass.getpass('Jira Password:')
+			self.auth = requests.auth.HTTPBasicAuth(username, password)
+
+			response = requests.get(self.baseUrl + self.getMyselfRoute, auth=self.auth)
+			if response.status_code == 200:
+				print('Jira login successful\n')
+				self.username = response.json()['key']
+				break
+			else:
+				print('Jira login was not successful, please try again\n')
 
 	def getIssue(self, issueNumber):
 		url = self.baseUrl + self.getIssueRoute.replace('{issueNumber}', issueNumber)
@@ -160,7 +169,7 @@ class JiraAPI:
 			"dateStarted": togglLog.date.isoformat(),
 			"comment": comment,
 			"author": {
-				"name": "gudjon"
+				"name": self.username
 			},
 		}
 		response = requests.post(url, json=payload, auth=self.auth)
@@ -213,6 +222,7 @@ def main():
 	togglApi.authenticate()
 
 	jiraApi = JiraAPI()
+	jiraApi.authenticate()
 
 	togglLogs = togglApi.getLogs()
 
