@@ -9,9 +9,9 @@ class TogglApi:
 	"""docstring for TogglApi."""
 	def __init__(self,):
 		self.baseUrl = 'https://www.toggl.com/api/v8'
-		self.getLogsRoute = '/time_entries'
+		self.getTimeEntriesRoute = '/time_entries'
 		self.getMeRoute = '/me'
-		self.postTagsRoute = 'TODO'
+		self.postTagRoute = '/time_entries/{timeEntryId}'
 
 	def authenticate(self):
 		while True:
@@ -27,8 +27,8 @@ class TogglApi:
 				print('Toggl login was not successful, please try again\n')
 
 
-	def getLogs(self, sinceDate=None):
-		url = self.baseUrl + self.getLogsRoute
+	def getTimeEntries(self, sinceDate=None):
+		url = self.baseUrl + self.getTimeEntriesRoute
 
 		sinceDate = sinceDate if sinceDate is not None else datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 		payload = {
@@ -41,42 +41,55 @@ class TogglApi:
 
 		response.raise_for_status()
 
-		# Parse toggl worklogs json to python object
-		worklogs = response.json()
+		# Parse toggl time entries json to python object
+		timeEntries = response.json()
 		# print(response.text)
-		# Filter out logs that are tagged with 'logged'
-		allLogs = [TogglLog(wl) for wl in worklogs if "Logged" not in wl.get('tags', [])]
+		# Filter out entries that are tagged with 'logged'
+		allEntries = [TogglTimeEntry(te) for te in timeEntries if "Logged" not in te.get('tags', [])]
 
-		# Group logs by issue number with summed up duration
-		return self.groupLogs(allLogs)
-	# END def getLogs()
+		# Group entries by issue number with summed up duration
+		return self.groupEntries(allEntries)
+	# END def getTimeEntries()
 
-	def groupLogs(self, logs):
+	def postTag(self, timeEntryId):
+		url = self.baseUrl + self.postTagRoute.replace('{timeEntryId}', str(timeEntryId))
+
+		payload = {
+			"time_entry": {
+				"tags": ['logged'],
+				"tag_action": "add"
+			}
+		}
+		response = requests.put(url, json=payload, auth=self.auth)
+		response.raise_for_status()
+		print('TogglAPI: Time entry marked as logged')
+
+	def groupEntries(self, entries):
 		from collections import defaultdict
 		groupBy = defaultdict(list)
-		for log in logs:
-			groupBy[log.issueNumber].append(log)
+		for entry in entries:
+			groupBy[entry.issueNumber].append(entry)
 
 		newList = []
 
 		for issueNumber, group in groupBy.items():
-			log = group[0]
+			entry = group[0]
 			sum = 0
-			for log in group:
-				sum += log.durationSeconds
-			log.durationMs = sum
-			newList.append(log)
+			for entry in group:
+				sum += entry.durationSeconds
+			entry.durationMs = sum
+			newList.append(entry)
 		return newList
-	# END def groupLogs(logs)
+	# END def groupEntries(entries)
 
-class TogglLog:
-	"""docstring for TogglLog."""
-	def __init__(self, log):
-		descriptionSplit = self.splitLogDescription(log['description'])
+class TogglTimeEntry:
+	def __init__(self, json):
+		self.id = json['id']
+		descriptionSplit = self.splitEntryDescription(json['description'])
 		self.description = descriptionSplit['description']
 		self.issueNumber = descriptionSplit['issueNumber']
-		self.date = dateutil.parser.parse(log['start']).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
-		self.durationSeconds = log['duration']
+		self.date = dateutil.parser.parse(json['start']).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+		self.durationSeconds = json['duration']
 
 	def formatDuration(self):
 		ret = ''
@@ -95,7 +108,7 @@ class TogglLog:
 
 		return ret;
 
-	def splitLogDescription(self, description):
+	def splitEntryDescription(self, description):
 		reMatch = re.match( r'([a-zA-Z0-9]+-[0-9]+)\s*(.*)', description)
 		issueNumber = None
 		description = description
@@ -115,7 +128,7 @@ class TogglLog:
 			self.issueNumber = input('Issue Number:      ')
 		else:
 			print('Issue Number:      ' + self.issueNumber)
-# END class TogglLog
+# END class TogglTimeEntry
 
 class JiraAPI:
 	"""docstring for JiraAPI."""
@@ -154,19 +167,19 @@ class JiraAPI:
 
 		return JiraIssue(response.json())
 
-	def postWorklog(self, togglLog):
+	def postWorklog(self, timeEntry):
 		comment = input('Comment: ')
 		remainingEstimateSeconds = self._inputRemainingEstimate()
 
 		url = self.baseUrl + self.postWorklogRoute
 		payload = {
 			"issue": {
-				"key": togglLog.issueNumber.upper(),
+				"key": timeEntry.issueNumber.upper(),
 				"remainingEstimateSeconds": remainingEstimateSeconds
 			},
-			"timeSpentSeconds": togglLog.durationSeconds,
-			"billedSeconds": togglLog.durationSeconds,
-			"dateStarted": togglLog.date.isoformat(),
+			"timeSpentSeconds": timeEntry.durationSeconds,
+			"billedSeconds": timeEntry.durationSeconds,
+			"dateStarted": timeEntry.date.isoformat(),
 			"comment": comment,
 			"author": {
 				"name": self.username
@@ -174,11 +187,15 @@ class JiraAPI:
 		}
 		response = requests.post(url, json=payload, auth=self.auth)
 		response.raise_for_status()
-		print('Worklog for issue \'' + togglLog.issueNumber + '\' successfully sent to Jira')
+		print('JiraAPI: Time entry for issue \'' + timeEntry.issueNumber + '\' successfully logged')
 
 	def _inputRemainingEstimate(self):
 		while True:
 			remainingEstimateStr = input('Remaining estimate: ')
+
+			if remainingEstimateStr == '0':
+				return 0
+
 			reMatch = re.match( r'^(([0-9]+)h)?\s*(([0-9]+)m)?$', remainingEstimateStr) # todo suppord day?
 			hours = 0
 			minutes = 0
@@ -224,20 +241,21 @@ def main():
 	jiraApi = JiraAPI()
 	jiraApi.authenticate()
 
-	togglLogs = togglApi.getLogs()
+	timeEntries = togglApi.getTimeEntries()
 
-	for log in togglLogs:
+	for entry in timeEntries:
 		print('-----------------------------------------------------------------')
-		log.print()
+		entry.print()
 
 		print('-----------------------------------------------------------------')
 
-		jiraIssue = jiraApi.getIssue(log.issueNumber)
+		jiraIssue = jiraApi.getIssue(entry.issueNumber)
 		jiraIssue.print()
 
 		print('-----------------------------------------------------------------')
 
-		jiraApi.postWorklog(log)
+		jiraApi.postWorklog(entry)
+		togglApi.postTag(entry.id)
 		print('-----------------------------------------------------------------\n')
 
 # END def main()
