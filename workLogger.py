@@ -10,13 +10,21 @@ class TogglApi:
 	def __init__(self,):
 		self.baseUrl = 'https://www.toggl.com/api/v8'
 		self.getLogsRoute = '/time_entries'
-		self.portTagsRoute = 'TODO'
-		self.auth = self.authorization()
+		self.getMeRoute = '/me'
+		self.postTagsRoute = 'TODO'
 
-	def authorization(self):
-		username = input('Toggl Username:')
-		password = getpass.getpass('Toggl Password:')
-		return requests.auth.HTTPBasicAuth(username, password)
+	def authenticate(self):
+		while True:
+			username = input('Toggl Username:')
+			password = getpass.getpass('Toggl Password:')
+			self.auth = requests.auth.HTTPBasicAuth(username, password)
+
+			response = requests.get(self.baseUrl + self.getMeRoute, auth=self.auth)
+			if response.status_code == 200:
+				print('Toggl login successful\n')
+				break
+			else:
+				print('Toggl login was not successful, please try again\n')
 
 
 	def getLogs(self, sinceDate=None):
@@ -202,6 +210,8 @@ class JiraIssue:
 
 def main():
 	togglApi = TogglApi()
+	togglApi.authenticate()
+
 	jiraApi = JiraAPI()
 
 	togglLogs = togglApi.getLogs()
