@@ -114,7 +114,7 @@ class JiraAPI:
 		super(JiraAPI, self).__init__()
 		self.baseUrl = 'https://sendiradid.atlassian.net'
 		self.getIssueRoute = '/rest/api/2/issue/{issueNumber}'
-		self.postWorklog = '/rest/tempo-timesheets/3/worklogs/'
+		self.postWorklogRoute = '/rest/tempo-timesheets/3/worklogs/'
 		self.auth = self.authorization()
 
 	def authorization(self):
@@ -135,6 +135,26 @@ class JiraAPI:
 		response.raise_for_status()
 
 		return JiraIssue(response.json())
+
+	def postWorklog(self, togglLog, comment):
+		url = self.baseUrl + self.postWorklogRoute
+		payload = {
+			"issue": {
+				"key": "SEN-112",
+				"remainingEstimateSeconds": 0
+			},
+			"timeSpentSeconds": 3600,
+			"billedSeconds": 3600,
+			"dateStarted": "2017-01-02T00:00:00.000",
+			"comment": "Test description",
+			"author": {
+				"name": "gudjon"
+			},
+		}
+		response = requests.post(url, json=payload, auth=self.auth)
+		response.raise_for_status()
+		print(response.json())
+
 # END class JiraAPI
 
 
@@ -173,6 +193,8 @@ def main():
 
 		jiraIssue = jiraApi.getIssue(log.issueNumber)
 		jiraIssue.print()
+
+		jiraApi.postWorklog(log, 'comment')
 		print('-----------------------------------------------------------------\n')
 
 # END def main()
