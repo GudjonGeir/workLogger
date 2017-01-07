@@ -3,6 +3,7 @@ import datetime
 import re
 import sys
 import getpass
+import dateutil.parser
 
 class TogglApi:
 	"""docstring for TogglApi."""
@@ -66,7 +67,7 @@ class TogglLog:
 		descriptionSplit = self.splitLogDescription(log['description'])
 		self.description = descriptionSplit['description']
 		self.issueNumber = descriptionSplit['issueNumber']
-
+		self.date = dateutil.parser.parse(log['start']).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 		self.durationSeconds = log['duration']
 
 	def formatDuration(self):
@@ -136,24 +137,44 @@ class JiraAPI:
 
 		return JiraIssue(response.json())
 
-	def postWorklog(self, togglLog, comment):
+	def postWorklog(self, togglLog):
+		comment = input('Comment: ')
+		remainingEstimateSeconds = self._inputRemainingEstimate()
+
 		url = self.baseUrl + self.postWorklogRoute
 		payload = {
 			"issue": {
-				"key": "SEN-112",
-				"remainingEstimateSeconds": 0
+				"key": togglLog.issueNumber.upper(),
+				"remainingEstimateSeconds": remainingEstimateSeconds
 			},
-			"timeSpentSeconds": 3600,
-			"billedSeconds": 3600,
-			"dateStarted": "2017-01-02T00:00:00.000",
-			"comment": "Test description",
+			"timeSpentSeconds": togglLog.durationSeconds,
+			"billedSeconds": togglLog.durationSeconds,
+			"dateStarted": togglLog.date.isoformat(),
+			"comment": comment,
 			"author": {
 				"name": "gudjon"
 			},
 		}
 		response = requests.post(url, json=payload, auth=self.auth)
 		response.raise_for_status()
-		print(response.json())
+		print('Worklog for issue \'' + togglLog.issueNumber + '\' successfully sent to Jira')
+
+	def _inputRemainingEstimate(self):
+		while True:
+			remainingEstimateStr = input('Remaining estimate: ')
+			reMatch = re.match( r'^(([0-9]+)h)?\s*(([0-9]+)m)?$', remainingEstimateStr) # todo suppord day?
+			hours = 0
+			minutes = 0
+			seconds = 0
+
+			if reMatch:
+				if reMatch.group(2) is not None: hours = reMatch.group(2)
+				if reMatch.group(4) is not None: minutes = reMatch.group(4)
+
+				seconds = (int(hours) * 3600) + (int(minutes) * 60)
+				return seconds
+			else:
+				print('Unsupported time string, try again')
 
 # END class JiraAPI
 
@@ -194,7 +215,9 @@ def main():
 		jiraIssue = jiraApi.getIssue(log.issueNumber)
 		jiraIssue.print()
 
-		jiraApi.postWorklog(log, 'comment')
+		print('-----------------------------------------------------------------')
+
+		jiraApi.postWorklog(log)
 		print('-----------------------------------------------------------------\n')
 
 # END def main()
