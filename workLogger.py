@@ -27,7 +27,7 @@ class TogglApi:
 		}
 
 		response = requests.get(url, params=payload, auth=self.auth)
-		if response.status_code == 401:
+		if response.status_code == 401 or response.status_code == 403:
 			sys.exit("Toggl login failed")
 
 		response.raise_for_status()
@@ -130,6 +130,8 @@ class JiraAPI:
 		response = requests.get(url, params=payload, auth=self.auth)
 		if response.status_code == 401:
 			sys.exit("Jira login failed")
+		if response.status_code == 404:
+			sys.exit('Could not find issue with number: "' + issueNumber + '"' )
 		response.raise_for_status()
 
 		return JiraIssue(response.json())
