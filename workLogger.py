@@ -5,6 +5,24 @@ import sys
 import getpass
 import dateutil.parser
 
+def formatSecondsToTimeString(seconds):
+	ret = ''
+
+	if seconds <= 0:
+		return '0m'
+
+	hour = int(seconds / 3600)
+	if hour > 0:
+		ret += str(hour) + 'h'
+
+	minutes = int((seconds % 3600) / 60)
+	if hour > 0 and minutes > 0:
+		ret += ' '
+	if minutes > 0:
+		 ret += str(minutes) + 'm'
+
+	return ret;
+
 class TogglApi:
 	"""docstring for TogglApi."""
 	def __init__(self,):
@@ -90,23 +108,17 @@ class TogglTimeEntry:
 		self.issueNumber = descriptionSplit['issueNumber']
 		self.date = dateutil.parser.parse(json['start']).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 		self.durationSeconds = json['duration']
+		self.remainingEstimateSeconds = -1
 
 	def formatDuration(self):
-		ret = ''
-		# remove ms
-		duration = self.durationSeconds
+		return formatSecondsToTimeString(self.durationSeconds)
 
-		hour = int(duration / 3600)
-		if hour > 0:
-			ret += str(hour) + 'h'
+	def formatRemainingEstimate(self):
+		if self.remainingEstimateSeconds == -1:
+			raise ValueError('Remaining estimate has no value')
+		return formatSecondsToTimeString(self.remainingEstimateSeconds)
 
-		minutes = int((duration % 3600) / 60)
-		if hour > 0 and minutes > 0:
-			ret += ' '
-		if minutes > 0:
-			 ret += str(minutes) + 'm'
 
-		return ret;
 
 	def splitEntryDescription(self, description):
 		reMatch = re.match( r'([a-zA-Z0-9]+-[0-9]+)\s*(.*)', description)
@@ -151,7 +163,7 @@ class JiraAPI:
 				self.username = response.json()['key']
 				break
 			else:
-				print('Jira login was not successful, please try again\n')
+				print('ERROR: Jira login was not successful, please try again\n')
 
 	def getIssue(self, issueNumber):
 		url = self.baseUrl + self.getIssueRoute.replace('{issueNumber}', issueNumber)
@@ -168,8 +180,17 @@ class JiraAPI:
 		return JiraIssue(response.json())
 
 	def postWorklog(self, timeEntry):
-		comment = input('Comment: ')
-		remainingEstimateSeconds = self._inputRemainingEstimate()
+		comment = ''
+		remainingEstimateSeconds = 0
+
+		if timeEntry.issueNumber == 'sen-14':
+			comment = 'Matur'
+			remainingEstimateSeconds = timeEntry.remainingEstimateSeconds
+			print('Comment: ' + comment)
+			print('Remaining estimate: ' + formatSecondsToTimeString(remainingEstimateSeconds))
+		else:
+			comment = input('Comment: ')
+			remainingEstimateSeconds = self._inputRemainingEstimate(timeEntry.remainingEstimateSeconds)
 
 		url = self.baseUrl + self.postWorklogRoute
 		payload = {
@@ -189,9 +210,12 @@ class JiraAPI:
 		response.raise_for_status()
 		print('JiraAPI: Time entry for issue \'' + timeEntry.issueNumber + '\' successfully logged')
 
-	def _inputRemainingEstimate(self):
+	def _inputRemainingEstimate(self, defaultValueSeconds):
 		while True:
-			remainingEstimateStr = input('Remaining estimate: ')
+			remainingEstimateStr = input('Remaining estimate[' + formatSecondsToTimeString(defaultValueSeconds) + ']: ')
+
+			if remainingEstimateStr == '':
+				return defaultValueSeconds
 
 			if remainingEstimateStr == '0':
 				return 0
@@ -220,6 +244,7 @@ class JiraIssue:
 		timetracking = json['fields'].get('timetracking')
 		self.originalEstimate = timetracking.get('originalEstimate') if timetracking is not None else None
 		self.remainingEstimate = timetracking.get('remainingEstimate') if timetracking is not None else None
+		self.remainingEstimateSeconds = timetracking.get('remainingEstimateSeconds') if timetracking is not None else 0
 		self.timeSpent = timetracking.get('timeSpent') if timetracking is not None else None
 		self.summary = json['fields']['summary']
 		self.description = json['fields']['description']
@@ -253,6 +278,9 @@ def main():
 		jiraIssue.print()
 
 		print('-----------------------------------------------------------------')
+
+		entry.remainingEstimateSeconds = jiraIssue.remainingEstimateSeconds - entry.durationSeconds
+		entry.remainingEstimateSeconds = entry.remainingEstimateSeconds if entry.remainingEstimateSeconds > 0 else 0
 
 		jiraApi.postWorklog(entry)
 		togglApi.postTag(entry.id)
