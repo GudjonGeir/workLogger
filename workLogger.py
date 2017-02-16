@@ -45,13 +45,16 @@ class TogglApi:
 				print('Toggl login was not successful, please try again\n')
 
 
-	def getTimeEntries(self, sinceDate=None):
+	def getTimeEntries(self, startDate):
 		url = self.baseUrl + self.getTimeEntriesRoute
 
-		sinceDate = sinceDate if sinceDate is not None else datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+		startDate = startDate if startDate is not None else datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+		endDate = startDate + datetime.timedelta(days=1)
 		payload = {
-			"start_date" : sinceDate.isoformat() + '+00:00'
+			"start_date" : startDate.isoformat() + '+00:00',
+			"end_date": endDate.isoformat() + '+00:00',
 		}
+
 
 		response = requests.get(url, params=payload, auth=self.auth)
 		if response.status_code == 401 or response.status_code == 403:
@@ -260,13 +263,25 @@ class JiraIssue:
 
 
 def main():
+
+	date = None
+	if len(sys.argv) > 1:
+		try:
+			dateString = sys.argv[1]
+
+			date = datetime.datetime.strptime(dateString, '%d/%m/%Y')
+		except ValueError:
+			print("Date should be on the format dd/MM/yyyy")
+			sys.exit(0)
+
+
 	togglApi = TogglApi()
 	togglApi.authenticate()
 
 	jiraApi = JiraAPI()
 	jiraApi.authenticate()
 
-	timeEntries = togglApi.getTimeEntries()
+	timeEntries = togglApi.getTimeEntries(date)
 
 	for entry in timeEntries:
 		print('-----------------------------------------------------------------')
