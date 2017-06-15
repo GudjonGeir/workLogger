@@ -21,7 +21,7 @@ def formatSecondsToTimeString(seconds):
 	if minutes > 0:
 		 ret += str(minutes) + 'm'
 
-	return ret;
+	return ret
 
 class TogglApi:
 	"""docstring for TogglApi."""
@@ -171,7 +171,7 @@ class JiraAPI:
 	def getIssue(self, issueNumber):
 		url = self.baseUrl + self.getIssueRoute.replace('{issueNumber}', issueNumber)
 		payload = {
-			'fields' : 'summary,description,timetracking'
+			'fields' : 'summary,description,timetracking,customfield_10002'
 		}
 		response = requests.get(url, params=payload, auth=self.auth)
 		if response.status_code == 401:
@@ -208,6 +208,25 @@ class JiraAPI:
 			"author": {
 				"name": self.username
 			},
+			'workAttributeValues': [
+				{
+					'worklogId': null,
+					'workAttribute': {
+						'id': 1,
+						'key': '_Account_',
+						'name': 'Account',
+						'type': {
+							'name': 'Account',
+							'value': 'ACCOUNT',
+							'systemType': false
+						},
+						'externalUrl': '/rest/tempo-rest/1.0/accounts/json/billingKeyList/{IssueKey}',
+						'required': false,
+						'sequence': 0
+					},
+					'value': timeEntries.account
+				}
+			]
 		}
 		response = requests.post(url, json=payload, auth=self.auth)
 		response.raise_for_status()
@@ -252,6 +271,9 @@ class JiraIssue:
 		self.summary = json['fields']['summary']
 		self.description = json['fields']['description']
 
+		accountField = json['fields'].get('customfield_10002')
+		self.account = accountField.get('key') if accountField is not None else None
+
 	def print(self):
 		print('Jira Issue:         ' + self.issueNumber)
 		print('Summary:            ' + self.summary)
@@ -291,14 +313,15 @@ def main():
 
 		jiraIssue = jiraApi.getIssue(entry.issueNumber)
 		jiraIssue.print()
-
+		
 		print('-----------------------------------------------------------------')
 
-		entry.remainingEstimateSeconds = jiraIssue.remainingEstimateSeconds - entry.durationSeconds
-		entry.remainingEstimateSeconds = entry.remainingEstimateSeconds if entry.remainingEstimateSeconds > 0 else 0
+		# entry.remainingEstimateSeconds = jiraIssue.remainingEstimateSeconds - entry.durationSeconds if jiraIssue.remainingEstimateSeconds is not None else 0
+		# entry.remainingEstimateSeconds = entry.remainingEstimateSeconds if entry.remainingEstimateSeconds > 0 else 0
+		entry.account = jiraIssue.account
 
-		jiraApi.postWorklog(entry)
-		togglApi.postTag(entry.id)
+		# jiraApi.postWorklog(entry)
+		# togglApi.postTag(entry.id)
 		print('-----------------------------------------------------------------\n')
 
 # END def main()

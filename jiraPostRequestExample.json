@@ -1,0 +1,38 @@
+{
+    "id": null,
+    "issue": {
+        "key": "EINKA-36",
+        "remainingEstimateSeconds": 0
+    },
+    "timeSpentSeconds": 7200,
+    "billedSeconds": 7200,
+    "dateStarted": "2017-05-26T00:00:00.000",
+    "comment": "Kláraði master grúppuna, bæti við að einkamáls adminar geta eytt öllum póstum.",
+    "meta": {
+        "analytics-origin-action": "clicked",
+        "analytics-origin-page": "WorklogCalendar",
+        "analytics-origin-view": "list"
+    },
+    "author": {
+        "name": "gudjon"
+    },
+    "workAttributeValues": [
+        {
+            "worklogId": null,
+            "workAttribute": {
+                "id": 1,
+                "key": "_Account_",
+                "name": "Account",
+                "type": {
+                    "name": "Account",
+                    "value": "ACCOUNT",
+                    "systemType": false
+                },
+                "externalUrl": "/rest/tempo-rest/1.0/accounts/json/billingKeyList/{IssueKey}",
+                "required": false,
+                "sequence": 0
+            },
+            "value": "6202070980Auka"
+        }
+    ]
+}
