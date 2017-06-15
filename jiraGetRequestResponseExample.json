@@ -1,4 +1,55 @@
 {
+    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations,io.tempo.jira__account.properties",
+    "id": "28104",
+    "self": "https://sendiradid.atlassian.net/rest/api/2/issue/28104",
+    "key": "IS-482",
+    "fields": {
+        "io.tempo.jira__account": {
+            "id": 91,
+            "value": "Isavia - app"
+        }
+    }
+}
+
+
+{
+	"expand":"renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations,customfield_10002.properties",
+	"id":"32706",
+	"self":"https://sendiradid.atlassian.net/rest/api/2/issue/32706",
+	"key":"IN-374",
+	"fields":{
+		"summary":"Custome View",
+		"description":null,
+		"customfield_10002":{"id":27,"value":"Sendiráðið"},
+		"timetracking":{
+			"originalEstimate":"2h","remainingEstimate":"2h","originalEstimateSeconds":7200,"remainingEstimateSeconds":7200}}}
+
+{
+    "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations,io.tempo.jira__account.properties",
+    "id": "32228",
+    "self": "https://sendiradid.atlassian.net/rest/api/2/issue/32228",
+    "key": "IN-363",
+    "fields": {
+        "summary": "Spjall: Næ ekki að hefja spjall þar sem ég finn hvorki notanda né næ að ýta á enter og þar með koma texta frá mér í textaritli.",
+        "description": "https://trello.com/c/b9ieOS5N/409-spjall-n%C3%A6-ekki-a%C3%B0-hefja-spjall-%C3%BEar-sem-%C3%A9g-finn-hvorki-notanda-n%C3%A9-n%C3%A6-a%C3%B0-%C3%BDta-%C3%A1-enter-og-%C3%BEar-me%C3%B0-koma-texta-fr%C3%A1-m%C3%A9r-%C3%AD-textaritli",
+        "io.tempo.jira__account": {
+            "id": 27,
+            "value": "Sendiráðið"
+        },
+        "timetracking": {
+            "originalEstimate": "1h 30m",
+            "remainingEstimate": "1h 15m",
+            "timeSpent": "15m",
+            "originalEstimateSeconds": 5400,
+            "remainingEstimateSeconds": 4500,
+            "timeSpentSeconds": 900
+        }
+    }
+}
+
+
+
+{
     "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
     "fields": {
         "aggregateprogress": {

@@ -36,3 +36,24 @@
         }
     ]
 }
+
+{
+    "id": null,
+    "issue": {
+        "key": "IS-482",
+        "remainingEstimateSeconds": 0,
+        "id": "28104"
+    },
+    "timeSpentSeconds": 4500,
+    "dateStarted": "2017-05-29T09:00:00.000",
+    "comment": "Rannsóknarvinna i hvernig best er að halda utan um analytics um notkun og fjölda niðurhala á appinu. Prufaði lausn á android. Skrifaði komment á trello með niðurstöðum.",
+    "meta": {
+        "analytics-origin-action": "clicked",
+        "analytics-origin-page": "WorklogCalendar",
+        "analytics-origin-view": "list"
+    },
+    "author": {
+        "name": "gudjon"
+    },
+    "workAttributeValues": []
+}

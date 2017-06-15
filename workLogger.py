@@ -19,7 +19,7 @@ def formatSecondsToTimeString(seconds):
 	if hour > 0 and minutes > 0:
 		ret += ' '
 	if minutes > 0:
-		 ret += str(minutes) + 'm'
+		ret += str(minutes) + 'm'
 
 	return ret
 
@@ -30,6 +30,7 @@ class TogglApi:
 		self.getTimeEntriesRoute = '/time_entries'
 		self.getMeRoute = '/me'
 		self.postTagRoute = '/time_entries/{timeEntryId}'
+		self.auth = ''
 
 	def authenticate(self):
 		while True:
@@ -171,7 +172,7 @@ class JiraAPI:
 	def getIssue(self, issueNumber):
 		url = self.baseUrl + self.getIssueRoute.replace('{issueNumber}', issueNumber)
 		payload = {
-			'fields' : 'summary,description,timetracking,customfield_10002'
+			'fields' : 'summary,description,timetracking,customfield_10002,io.tempo.jira__account'
 		}
 		response = requests.get(url, params=payload, auth=self.auth)
 		if response.status_code == 401:
@@ -179,7 +180,7 @@ class JiraAPI:
 		if response.status_code == 404:
 			sys.exit('Could not find issue with number: "' + issueNumber + '"' )
 		response.raise_for_status()
-
+		
 		return JiraIssue(response.json())
 
 	def postWorklog(self, timeEntry):
@@ -203,14 +204,14 @@ class JiraAPI:
 			},
 			"timeSpentSeconds": timeEntry.durationSeconds,
 			"billedSeconds": timeEntry.durationSeconds,
-			"dateStarted": timeEntry.date.isoformat(),
+			"dateStarted": timeEntry.date.isoformat().split('.')[0] + '.000',
 			"comment": comment,
 			"author": {
 				"name": self.username
 			},
 			'workAttributeValues': [
 				{
-					'worklogId': null,
+					'value': timeEntry.account,
 					'workAttribute': {
 						'id': 1,
 						'key': '_Account_',
@@ -218,17 +219,16 @@ class JiraAPI:
 						'type': {
 							'name': 'Account',
 							'value': 'ACCOUNT',
-							'systemType': false
 						},
 						'externalUrl': '/rest/tempo-rest/1.0/accounts/json/billingKeyList/{IssueKey}',
-						'required': false,
+						'required': False,
 						'sequence': 0
-					},
-					'value': timeEntries.account
+					}
 				}
 			]
 		}
 		response = requests.post(url, json=payload, auth=self.auth)
+		
 		response.raise_for_status()
 		print('JiraAPI: Time entry for issue \'' + timeEntry.issueNumber + '\' successfully logged')
 
@@ -316,12 +316,12 @@ def main():
 		
 		print('-----------------------------------------------------------------')
 
-		# entry.remainingEstimateSeconds = jiraIssue.remainingEstimateSeconds - entry.durationSeconds if jiraIssue.remainingEstimateSeconds is not None else 0
-		# entry.remainingEstimateSeconds = entry.remainingEstimateSeconds if entry.remainingEstimateSeconds > 0 else 0
+		entry.remainingEstimateSeconds = jiraIssue.remainingEstimateSeconds - entry.durationSeconds if jiraIssue.remainingEstimateSeconds is not None else 0
+		entry.remainingEstimateSeconds = entry.remainingEstimateSeconds if entry.remainingEstimateSeconds > 0 else 0
 		entry.account = jiraIssue.account
-
-		# jiraApi.postWorklog(entry)
-		# togglApi.postTag(entry.id)
+		
+		jiraApi.postWorklog(entry)
+		togglApi.postTag(entry.id)
 		print('-----------------------------------------------------------------\n')
 
 # END def main()
